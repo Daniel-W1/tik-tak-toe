@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tik Tak Toe</title>
+
+    <style>
+      * {
+        margin: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background-color: rgba(39, 123, 134, 0.822);
+      }
+      .grid-container {
+        width: 40%;
+        height: 70%;
+        display: grid;
+        background-color: #033f47;
+
+        grid-template-columns: 1fr 1fr 1fr;
+
+        overflow: hidden;
+        transition: all 0.3s;
+      }
+
+      .grid-container:hover {
+        box-shadow: rgba(0, 0, 0, 0.35) 0px 20px 25px;
+      }
+      .cell {
+        border: 1px solid white;
+        transition: all 0.3s;
+      }
+
+      .cell:hover {
+        background-color: #e0f780;
+        cursor: pointer;
+      }
+      .cell:active {
+        transform: scale(0.95);
+      }
+
+      .done-x,
+      .done-o {
+        background-size: cover;
+        background-position: center;
+        background-color: #e0f780;
+      }
+
+      .done-x {
+        background-image: url(./ximage.png);
+      }
+      .done-o {
+        background-image: url(./oimage.png);
+      }
+
+      @media (max-width: 800px) {
+        .grid-container {
+          width: 70%;
+          height: 60%;
+        }
+      }
+      .btn {
+        border: none;
+        padding: 12px 28px;
+        background-color: #e0f780;
+        font-size: 2rem;
+        margin: 1rem;
+        border-radius: 3rem;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .btn:hover {
+        background-color: #033f47;
+        color: #fff;
+      }
+      .btn:active {
+        transform: scale(0.95);
+        background-color: #033f47;
+        color: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <button class="btn">RESET</button>
+    <div class="grid-container">
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+    </div>
+
+    <script>
+      // get all the cells first
+
+      var cells = document.getElementsByClassName("cell");
+      var ResetButton = document.getElementsByClassName("btn")[0];
+
+      console.log(ResetButton);
+
+      ResetButton.addEventListener("click", () => {
+        location.reload();
+      });
+
+      // console.log("here", cells);
+      let turn = true;
+      let done_cells = new Map();
+      var xImg = "url('./ximage.png');";
+      var oImg = "url('./oimage.png');";
+
+      for (let idx = 0; idx < cells.length; idx++) {
+        cells[idx].addEventListener("click", () => {
+          if (!done_cells.has(idx)) {
+            if (turn) {
+              cells[idx].classList.add("done-x");
+              done_cells.set(idx, xImg);
+            } else {
+              cells[idx].classList.add("done-o");
+              done_cells.set(idx, oImg);
+            }
+
+            turn = !turn;
+
+            let check1 = checkGameOver();
+            let check2 = checkDraw();
+
+            if (check1 != null) {
+              alert(`game over ${check1} wins`);
+              location.reload();
+              // show the modal thing
+            }
+            if (check2) {
+              alert("game over, it's a draw");
+              location.reload();
+              // show the draw modal thing
+            }
+          }
+        });
+      }
+
+      var Xwin = '["X","X","X"]';
+      var Owin = '["O","O","O"]';
+
+      function ConverImgToTxt(idx) {
+        if (!done_cells.has(idx)) return "!";
+        return done_cells.get(idx) == xImg ? "X" : "O";
+      }
+
+      function checkGameOver() {
+        // rows
+        let first_row = [
+          ConverImgToTxt(0),
+          ConverImgToTxt(1),
+          ConverImgToTxt(2),
+        ];
+        let second_row = [
+          ConverImgToTxt(3),
+          ConverImgToTxt(4),
+          ConverImgToTxt(5),
+        ];
+        let third_row = [
+          ConverImgToTxt(6),
+          ConverImgToTxt(7),
+          ConverImgToTxt(8),
+        ];
+
+        // columns
+        let first_col = [
+          ConverImgToTxt(0),
+          ConverImgToTxt(3),
+          ConverImgToTxt(6),
+        ];
+        let second_col = [
+          ConverImgToTxt(1),
+          ConverImgToTxt(4),
+          ConverImgToTxt(7),
+        ];
+        let third_col = [
+          ConverImgToTxt(2),
+          ConverImgToTxt(5),
+          ConverImgToTxt(8),
+        ];
+
+        // diagonals
+        let first_dia = [
+          ConverImgToTxt(0),
+          ConverImgToTxt(4),
+          ConverImgToTxt(8),
+        ];
+        let second_dia = [
+          ConverImgToTxt(2),
+          ConverImgToTxt(4),
+          ConverImgToTxt(6),
+        ];
+
+        if (
+          JSON.stringify(first_row) == Xwin ||
+          JSON.stringify(first_row) == Owin
+        ) {
+          return first_row[0];
+        }
+        if (
+          JSON.stringify(second_row) == Xwin ||
+          JSON.stringify(second_row) == Owin
+        ) {
+          return second_row[0];
+        }
+        if (
+          JSON.stringify(third_row) == Xwin ||
+          JSON.stringify(third_row) == Owin
+        ) {
+          return third_row[0];
+        }
+
+        if (
+          JSON.stringify(first_col) == Xwin ||
+          JSON.stringify(first_col) == Owin
+        ) {
+          return first_col[0];
+        }
+        if (
+          JSON.stringify(second_col) == Xwin ||
+          JSON.stringify(second_col) == Owin
+        ) {
+          return second_col[0];
+        }
+        if (
+          JSON.stringify(third_col) == Xwin ||
+          JSON.stringify(third_col) == Owin
+        ) {
+          return third_col[0];
+        }
+
+        if (
+          JSON.stringify(first_dia) == Xwin ||
+          JSON.stringify(first_dia) == Owin
+        ) {
+          return first_dia[0];
+        }
+        if (
+          JSON.stringify(second_dia) == Xwin ||
+          JSON.stringify(second_dia) == Owin
+        ) {
+          return second_dia[0];
+        }
+
+        return null;
+      }
+
+      function checkDraw() {
+        return done_cells.size == 9;
+      }
+    </script>
+  </body>
+</html>
